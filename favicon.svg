@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="gold-rose" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d4a373" />
+      <stop offset="100%" stop-color="#e8a598" />
+    </linearGradient>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@900&amp;display=swap');
+      .serif-gc {
+        font-family: 'Cinzel Decorative', serif;
+        font-weight: 900;
+        font-size: 55px;
+        fill: url(#gold-rose);
+        text-anchor: middle;
+        dominant-baseline: central;
+      }
+    </style>
+  </defs>
+  
+  <!-- Círculo de fondo oscuro con anillo en degradado de oro rosa -->
+  <circle cx="50" cy="50" r="46" fill="#0c0a0f" stroke="url(#gold-rose)" stroke-width="2.5" />
+  
+  <!-- Monograma "GC" con tipografía artística Cinzel Decorative y degradado de oro rosa completo -->
+  <text x="50" y="50" class="serif-gc" letter-spacing="-3">GC</text>
+</svg>

@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gaby Castañeda | Link Tree Oficial</title>
+<!-- CACHE BUSTING -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<!-- OPEN GRAPH -->
+<meta property="og:title" content="Gaby Castañeda | Redes y Lanzamientos">
+<meta property="og:description" content="Cantante y compositora. Escucha 'Siento Que Te Pierdo' y únete a mi comunidad.">
+<meta property="og:image" content="fotossitio/gaby1.jpg">
+<meta property="og:type" content="website">
+
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700&display=swap');
+
+/* RESET */
+html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+    color: white;
+    -webkit-font-smoothing: antialiased;
+    background-color: #0c0a0f;
+    overscroll-behavior-y: none;
+}
+
+/* SCROLL WRAPPER */
+.scroll-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+    overscroll-behavior-y: none;
+    -webkit-overflow-scrolling: touch;
+    z-index: 10;
+}
+
+/* BACKGROUND DYNAMICS (SLIDESHOW DE 3 FOTOS) */
+.bg-slideshow, .bg-overlay {
+    position: fixed;
+    top: -50px; 
+    left: -50px; 
+    width: calc(100vw + 100px);
+    height: calc(100vh + 100px);
+    height: calc(100lvh + 100px);
+}
+
+.bg-slideshow { 
+    z-index: 0; 
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.slide {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-size: cover;
+    background-position: center top;
+    opacity: 0;
+    animation: slideAnim 18s infinite linear;
+}
+
+/* Tiempos de animación para un crossfade perfecto de 3 imágenes */
+.slide:nth-child(1) { animation-delay: 0s; }
+.slide:nth-child(2) { animation-delay: 6s; }
+.slide:nth-child(3) { animation-delay: 12s; }
+
+@keyframes slideAnim {
+    0% { opacity: 0; transform: scale(1.1); }
+    8% { opacity: 1; transform: scale(1.08); }
+    33% { opacity: 1; transform: scale(1.04); }
+    41% { opacity: 0; transform: scale(1); }
+    100% { opacity: 0; }
+}
+
+/* OVERLAY CON DEGRADADO PREMIUM (OBSIDIANA A ORO ROSA OSCURO) */
+.bg-overlay {
+    z-index: 1;
+    background: linear-gradient(to bottom, rgba(12, 10, 15, 0.55), rgba(12, 10, 15, 0.94));
+    pointer-events: none;
+}
+
+/* EFECTO DE LUZ ESTELAR / DESTELLOS DE ORO ROSA (PARTICULAS CSS) */
+.particles {
+    position: fixed;
+    top: -50px; 
+    left: -50px; 
+    width: calc(100vw + 100px);
+    height: calc(100vh + 100px);
+    height: calc(100lvh + 100px);
+    z-index: 2;
+    pointer-events: none;
+    background-image: 
+        radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 40px 70px, #ffebd9, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 50px 160px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 90px 40px, #e8a598, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 130px 80px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 160px 120px, #d4a373, rgba(0,0,0,0));
+    background-repeat: repeat;
+    background-size: 200px 200px;
+    animation: stars 60s linear infinite;
+    opacity: 0.45;
+}
+
+@keyframes stars {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-200px); }
+}
+
+/* LAYOUT VERTICAL PARA PC Y MÓVIL */
+.layout {
+    display: flex;
+    flex-direction: column;
+    padding: 40px 20px;
+    align-items: center;
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100vh;
+    position: relative;
+    z-index: 10;
+}
+
+/* PERFIL */
+.perfil {
+    width: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* AVATAR ANIMADO Y PREMIUM */
+.avatar-box {
+    position: relative;
+    display: inline-block;
+}
+
+.avatar {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.85);
+    box-shadow: 0 0 40px rgba(212, 163, 115, 0.55);
+    object-fit: cover;
+    padding: 3px;
+    background: linear-gradient(45deg, #d4a373, #e8a598);
+}
+
+.verificado {
+    position: absolute;
+    bottom: 1px;
+    right: 1px;
+}
+
+.verificado img {
+    width: 35px;
+}
+
+/* TEXTOS DEL PERFIL */
+.perfil h1 {
+    margin-top: 25px;
+    margin-bottom: 5px;
+    font-size: 28px;
+    font-weight: 800;
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: -0.5px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.85);
+}
+
+.perfil p.bio {
+    color: rgba(255,255,255,0.9);
+    font-size: 15px;
+    margin-bottom: 25px;
+    font-weight: 400;
+    line-height: 1.4;
+    text-shadow: 0 1px 5px rgba(0,0,0,0.8);
+}
+
+/* CONTADOR DE VISITAS (MICRO CARD) */
+.micro-card {
+    margin-bottom: 30px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(15px);
+    font-size: 13px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+.micro-card i {
+    color: #d4a373;
+}
+
+/* MAIN CONTENT */
+.main {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* TARJETA DESTACADA (SIENTO QUE TE PIERDO) */
+.featured-card {
+    position: relative;
+    border-radius: 24px;
+    overflow: hidden;
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border: 1px solid rgba(212, 163, 115, 0.35);
+    margin-bottom: 15px;
+    color: white !important;
+}
+
+.featured-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 50%; height: 100%;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent);
+    transform: skewX(-20deg);
+    animation: shine 6s infinite;
+    z-index: 5;
+}
+
+@keyframes shine {
+    0% { left: -100%; }
+    20% { left: 200%; }
+    100% { left: 200%; }
+}
+
+.featured-card:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 25px 50px rgba(212, 163, 115, 0.45);
+    border-color: rgba(212, 163, 115, 0.75);
+}
+
+.featured-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('fotossitio/gaby2.jpg') no-repeat center center;
+    background-size: cover;
+    filter: blur(2px) brightness(0.6);
+    transition: all 0.7s ease;
+}
+
+.featured-card:hover .featured-bg {
+    filter: blur(0px) brightness(0.85);
+    transform: scale(1.08);
+}
+
+.featured-content {
+    position: relative;
+    padding: 35px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    z-index: 2;
+}
+
+.badge {
+    background: #d4a373;
+    color: white;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 6px 16px;
+    border-radius: 20px;
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    animation: pulse 2s infinite;
+    box-shadow: 0 0 15px rgba(212, 163, 115, 0.7);
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(212, 163, 115, 0.7); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(212, 163, 115, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(212, 163, 115, 0); }
+}
+
+.featured-content h2 {
+    margin: 0;
+    font-size: 32px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-shadow: 0 4px 15px rgba(0,0,0,0.85);
+    color: white;
+    transition: color 0.3s ease;
+}
+
+.featured-card:hover .featured-content h2 {
+    color: #ffebd9;
+}
+
+.featured-content p {
+    font-size: 15px;
+    margin: 8px 0 25px 0;
+    opacity: 0.95;
+    color: white;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+}
+
+.featured-btn {
+    background: white;
+    color: #1a1a1a;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 30px;
+    font-weight: 800;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.4s ease;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+.featured-card:hover .featured-btn {
+    background: #d4a373;
+    color: white;
+    box-shadow: 0 15px 30px rgba(212, 163, 115, 0.5);
+}
+
+/* BOTONES NORMALES GLASSMORPHISM PREMIUM */
+.btn {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.07);
+    padding: 20px 24px;
+    border-radius: 20px;
+    text-decoration: none;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+.btn:hover {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(212, 163, 115, 0.4);
+    transform: translateY(-4px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.35);
+}
+
+.left {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    font-weight: 600;
+    font-size: 16px;
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: 0.5px;
+}
+
+.left i {
+    font-size: 22px;
+    width: 28px;
+    text-align: center;
+    transition: transform 0.4s;
+}
+
+.btn:hover .left i {
+    transform: scale(1.2);
+}
+
+.right i {
+    opacity: 0.4;
+    font-size: 16px;
+    transition: 0.4s;
+}
+
+.btn:hover .right i {
+    opacity: 1;
+    transform: translateX(5px);
+    color: #d4a373;
+}
+
+/* COLORES DE ICONOS EN BOTONES */
+.fa-spotify { color: #1DB954; }
+.fa-apple { color: #ffffff; }
+.fa-whatsapp { color: #25D366; }
+.fa-instagram { color: #E1306C; }
+.fa-tiktok { color: #ffffff; }
+.fa-youtube { color: #ff0000; }
+.fa-facebook-f { color: #1877f2; }
+.fa-paypal { color: #0070ba; }
+.fa-calendar-check { color: #d4a373; }
+
+/* TITULOS */
+.section-title {
+    margin-top: 35px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.7);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 10px;
+    text-align: center;
+    font-weight: 800;
+}
+
+/* FOOTER */
+.footer {
+    text-align: center;
+    margin-top: 50px;
+    margin-bottom: 30px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 1px;
+}
+
+/* RESPONSIVIDAD PARA PANTALLAS PEQUEÑAS */
+@media (max-width: 380px) {
+    .perfil h1 { font-size: 24px; }
+    .perfil p.bio { font-size: 14px; margin-bottom: 20px; }
+    .avatar { width: 110px; height: 110px; }
+    .featured-content h2 { font-size: 26px; }
+    .featured-content p { font-size: 14px; }
+    .btn { padding: 16px 20px; border-radius: 16px; }
+    .left { font-size: 15px; gap: 12px; }
+    .left i { font-size: 20px; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- BACKGROUND ANIMADO DINÁMICO (CARRUSEL CROSSFADE DE 3 IMÁGENES) -->
+<div class="bg-slideshow">
+    <div class="slide" style="background-image: url('fotosdefondo/fondo1.jpg');"></div>
+    <div class="slide" style="background-image: url('fotosdefondo/fondo2.jpg');"></div>
+    <div class="slide" style="background-image: url('fotosdefondo/fondo3.jpg');"></div>
+</div>
+<!-- SUPERPOSICIÓN OSCURA Y EFECTO DE PARTÍCULAS -->
+<div class="bg-overlay"></div>
+<div class="particles"></div>
+
+<div class="scroll-wrapper">
+<div class="layout">
+
+    <!-- PERFIL -->
+    <div class="perfil">
+        <div class="avatar-box">
+            <img src="fotossitio/gaby1.jpg" class="avatar" alt="Gaby Castañeda">
+            <div class="verificado">
+                <img src="https://cdn-icons-png.flaticon.com/512/11820/11820285.png" alt="Verificado">
+            </div>
+        </div>
+
+        <h1>Gaby Castañeda</h1>
+        <p class="bio">Cantante y compositora 🎤 Ecuador 📍</p>
+
+        <!-- CONTADOR DE VISITAS -->
+        <div class="micro-card" id="visitas-card">
+            <i class="fa-solid fa-chart-line"></i> Visitas: <strong id="visitas-count">--</strong> <span id="visitas-status"></span>
+        </div>
+    </div>
+
+    <!-- MAIN LINKS -->
+    <div class="main">
+
+        <!-- TARJETA DESTACADA: SIENTO QUE TE PIERDO -->
+        <div class="featured-card" style="cursor: pointer; min-height: 220px;" onclick="this.innerHTML=`<iframe width='100%' height='100%' style='position:absolute; top:0; left:0; width:100%; height:100%; border:none; border-radius:24px;' src='https://www.youtube.com/embed/c20Z3LdNlMw?autoplay=1' allow='autoplay; encrypted-media; picture-in-picture' allowfullscreen></iframe>`; this.onclick=null;">
+            <div class="featured-bg"></div>
+            <div class="featured-content">
+                <span class="badge">¡NUEVO LANZAMIENTO!</span>
+                <h2>SIENTO QUE TE PIERDO</h2>
+                <p>Escucha mi nuevo sencillo oficial en YouTube</p>
+                <div class="featured-btn">
+                    <i class="fa-solid fa-play"></i> REPRODUCIR
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title">Música y Streaming</div>
+
+        <a href="https://open.spotify.com/artist/5AgNw50M2JJ9tDmRfA1rPW?si=UfOhLkAwTkShrJNG3r51IQ&nd=1&dlsi=a93bede7a6284fd7" target="_blank" class="btn">
+            <div class="left"><i class="fa-brands fa-spotify"></i><span>Spotify</span></div>
+            <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
+        </a>
+
+        <a href="https://music.apple.com/us/artist/gaby-casta%C3%B1eda/1796297834?l=es-MX" target="_blank" class="btn">
+            <div class="left"><i class="fa-brands fa-apple"></i><span>Apple Music</span></div>
+            <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
+        </a>
+
+        <a href="https://www.youtube.com/@GABYCASTAEDAVEVO" target="_blank" class="btn">
+            <div class="left"><i class="fa-brands fa-youtube"></i><span>YouTube Oficial</span></div>
+            <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
+        </a>
+
+        <div class="section-title">Comunidad y Redes</div>
+
+        <a href="https://www.whatsapp.com/channel/0029Vb5mRcO1yT20QQy8xL0w" target="_blank" class="btn">
+            <div class="left"><i class="fa-brands fa-whatsapp"></i><span>Canal de WhatsApp</span></div>
+            <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
+        </a>
+
+        <a href="https://www.instagram.com/gcastaneda.music/" target="_blank" class="btn">
+            <div class="left"><i class="fa-brands fa-instagram"></i><span>Instagram</span></div>
+            <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
+        </a>
+
+        <a href="https://www.tiktok.com/@gaby_castan3da" target="_blank" class="btn">
+            <div class="left"><i class="fa-brands fa-tiktok"></i><span>TikTok</span></div>
+            <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
+        </a>
+
+        <a href="https://www.facebook.com/people/Gaby-Casta%C3%B1eda/61573263895160/?rdid=JFnoMmwwqovDcGm4&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1ZqsXjx5ZX%2F" target="_blank" class="btn">
+            <div class="left"><i class="fa-brands fa-facebook-f"></i><span>Facebook</span></div>
+            <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
+        </a>
+
+        <div class="section-title">Contacto y Apoyo</div>
+
+        <a href="https://wa.me/593967619878?text=Hola%2C%20Gaby.%0A%0AEspero%20que%20te%20encuentres%20muy%20bien.%20Me%20comunico%20porque%20estoy%20interesado(a)%20en%20contratar%20tus%20servicios%20art%C3%ADsticos%20para%20un%20evento%20y%20me%20gustar%C3%ADa%20conocer%20informaci%C3%B3n%20sobre%20tu%20disponibilidad%2C%20tarifas%20y%20las%20diferentes%20opciones%20de%20presentaci%C3%B3n%20que%20ofreces.%0A%0AQuedo%20atento(a)%20a%20tu%20respuesta%20y%20agradezco%20de%20antemano%20tu%20atenci%C3%B3n.%0A%0ASaludos%20cordiales." target="_blank" class="btn">
+            <div class="left"><i class="fa-solid fa-calendar-check"></i><span>Contrataciones</span></div>
+            <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
+        </a>
+
+        <a href="https://www.paypal.com/paypalme/gabsevely" target="_blank" class="btn">
+            <div class="left"><i class="fa-brands fa-paypal"></i><span>Apoyar en PayPal</span></div>
+            <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
+        </a>
+
+    </div>
+
+    <div class="footer">
+        © 2026 GABY CASTAÑEDA · Todos los derechos reservados
+    </div>
+
+</div>
+
+</div>
+
+<!-- SCRIPT CONTADOR DE VISITAS (API GLOBAL REAL) -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const counterNamespace = "gaby_castaneda_linktree";
+    const counterKey = "visitas_gaby_2026_real";
+    const localKey = 'gaby_user_status';
+    
+    // 1. Determinar si el visitante es nuevo en este navegador
+    let isNewUser = !localStorage.getItem(localKey);
+    if (isNewUser) {
+        localStorage.setItem(localKey, 'visited');
+        document.getElementById('visitas-status').innerHTML = "<strong>- Visitante nuevo</strong> 🎉";
+    } else {
+        document.getElementById('visitas-status').innerHTML = "<strong>- Visitante recurrente</strong> 🔥";
+    }
+
+    // 2. Conectar a un contador API global gratuito en tiempo real
+    fetch(`https://api.counterapi.dev/v1/${counterNamespace}/${counterKey}/up`)
+        .then(response => response.json())
+        .then(data => {
+            // Si funciona, mostramos los clics reales globales partiendo de 0
+            let totalVisitas = data.count || 0;
+            document.getElementById('visitas-count').innerText = totalVisitas.toLocaleString();
+        })
+        .catch(error => {
+            // Fallback de seguridad local si falla la API
+            let baseGlobal = 0;
+            let currentLocal = localStorage.getItem('fallback_count_gaby') || baseGlobal;
+            currentLocal = parseInt(currentLocal) + (isNewUser ? 1 : 0);
+            localStorage.setItem('fallback_count_gaby', currentLocal);
+            document.getElementById('visitas-count').innerText = parseInt(currentLocal).toLocaleString();
+        });
+});
+</script>
+
+</body>
+</html>
