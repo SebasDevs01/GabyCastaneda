@@ -657,8 +657,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const cachedValue = localStorage.getItem(cachedCountKey);
     if (cachedValue) showCounter(cachedValue);
 
-    // Usar CountAPI como API de conteo pública y gratuita
-    fetch('https://api.countapi.xyz/hit/sebasdevs01-GabyCastaneda/visits')
+    // Solo registrar visita (+1) si es la primera vez en este navegador.
+    // Si ya visitó antes, usar /get para solo leer el conteo sin sumar.
+    const apiUrl = isNewUser
+        ? 'https://api.countapi.xyz/hit/sebasdevs01-GabyCastaneda/visits'
+        : 'https://api.countapi.xyz/get/sebasdevs01-GabyCastaneda/visits';
+
+    fetch(apiUrl)
         .then(r => r.json())
         .then(data => {
             const total = data.value || 1;
@@ -666,18 +671,22 @@ document.addEventListener("DOMContentLoaded", function () {
             showCounter(total);
         })
         .catch(() => {
-            // Si falla la API, intentar con segunda API de respaldo
-            fetch('https://hits.seeyoufarm.com/api/count/incr/badge.json?url=sebasdevs01.github.io%2FGabyCastaneda&count_bg=%23000000&title_bg=%23000000&icon=&icon_color=%23000000&title=&edge_flat=false')
+            // Si falla la API principal, usar hits.seeyoufarm como respaldo.
+            // Solo incrementa si es visitante nuevo, de lo contrario solo lee.
+            const fallbackUrl = isNewUser
+                ? 'https://hits.seeyoufarm.com/api/count/incr/badge.json?url=sebasdevs01.github.io%2FGabyCastaneda&count_bg=%23000000&title_bg=%23000000&icon=&icon_color=%23000000&title=&edge_flat=false'
+                : 'https://hits.seeyoufarm.com/api/count/badge.json?url=sebasdevs01.github.io%2FGabyCastaneda';
+            fetch(fallbackUrl)
                 .then(r => r.json())
                 .then(d => {
-                    const total = d.today + d.total || 1;
+                    const total = (d.today || 0) + (d.total || 0) || 1;
                     localStorage.setItem(cachedCountKey, total);
                     showCounter(total);
                 })
                 .catch(() => {
-                    // Sin conexión: usar fallback local
+                    // Sin conexión: incrementar local solo si es visitante nuevo
                     let local = parseInt(localStorage.getItem('fallback_count_gaby') || '100');
-                    local += 1;
+                    if (isNewUser) local += 1;
                     localStorage.setItem('fallback_count_gaby', local);
                     localStorage.setItem(cachedCountKey, local);
                     showCounter(local);
