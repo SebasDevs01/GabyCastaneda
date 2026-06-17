@@ -753,17 +753,11 @@
             const visitsStatusEl = document.getElementById('visitas-status');
 
             // ── Determinar si es visita genuinamente nueva ──
-            // localKey → persiste entre sesiones (visita anterior en este navegador)
-            // sessionKey → vive solo en esta pestaña/sesión activa
-            // Solo es "nuevo" si NUNCA visitó con este navegador (no tiene localKey)
-            // Y además no ha sido contado ya en esta sesión (evita doble conteo en recarga)
             const hasVisitedBefore = !!localStorage.getItem(localKey);
             const alreadyCountedThisSession = !!sessionStorage.getItem(sessionKey);
-
             const isNewUser = !hasVisitedBefore && !alreadyCountedThisSession;
 
             if (isNewUser) {
-                // Marcar en localStorage (persistente) y en sessionStorage (esta sesión)
                 localStorage.setItem(localKey, 'visited');
                 sessionStorage.setItem(sessionKey, '1');
                 visitsStatusEl.innerHTML = "<strong>- Visitante nueva</strong> 🎉";
@@ -772,52 +766,63 @@
             }
 
             // ── MOSTRAR NÚMERO CACHEADO INMEDIATAMENTE (sin esperar la API) ──
-            // Si es usuario nuevo, mostramos optimistamente +1 al caché mientras llega la respuesta real.
             const cachedCount = parseInt(localStorage.getItem(cachedCountKey) || '0');
             const optimisticCount = isNewUser ? cachedCount + 1 : cachedCount;
             if (cachedCount > 0) {
                 visitsCountEl.innerText = optimisticCount.toLocaleString();
+            } else {
+                // Sin caché local, mostrar un placeholder mientras carga
+                visitsCountEl.innerText = '...';
             }
 
-            // ── SIEMPRE CONSULTAR LA API PARA OBTENER EL NÚMERO REAL ──
-            // Si es usuario nuevo → /up (suma 1 y devuelve total)
-            // Si es recurrente  → GET normal (solo lee el total real, sin sumar)
+            // ── CONSULTAR LA API COUNTERAPI.DEV (soporta CORS) ──
             const ns = 'sebasdevs01-gaby';
             const key = 'visits2';
             const apiUrl = isNewUser
                 ? `https://api.counterapi.dev/v1/${ns}/${key}/up`
                 : `https://api.counterapi.dev/v1/${ns}/${key}`;
 
-            fetch(apiUrl)
-                .then(r => r.json())
+            fetch(apiUrl, { mode: 'cors' })
+                .then(r => {
+                    if (!r.ok) throw new Error('HTTP ' + r.status);
+                    return r.json();
+                })
                 .then(data => {
                     const total = data.count ?? data.value;
                     if (total != null) {
-                        localStorage.setItem(cachedCountKey, total);
-                        visitsCountEl.innerText = parseInt(total).toLocaleString();
+                        const num = parseInt(total);
+                        localStorage.setItem(cachedCountKey, num);
+                        // Animación de conteo si es primera carga
+                        animateCount(visitsCountEl, cachedCount > 0 ? optimisticCount : 0, num);
                     }
                 })
                 .catch(() => {
-                    // Respaldo: CountAPI original
-                    const fallbackUrl = isNewUser
-                        ? 'https://api.countapi.xyz/hit/sebasdevs01-GabyCastaneda/visits'
-                        : 'https://api.countapi.xyz/get/sebasdevs01-GabyCastaneda/visits';
-                    fetch(fallbackUrl)
-                        .then(r => r.json())
-                        .then(data => {
-                            const total = data.value;
-                            if (total != null) {
-                                localStorage.setItem(cachedCountKey, total);
-                                visitsCountEl.innerText = parseInt(total).toLocaleString();
-                            }
-                        })
-                        .catch(() => {
-                            // Sin internet: mostrar el número optimista que ya está visible.
-                            if (cachedCount === 0) {
-                                visitsCountEl.innerText = '...';
-                            }
-                        });
+                    // Sin internet o error CORS: mostrar caché guardado
+                    if (cachedCount > 0) {
+                        visitsCountEl.innerText = optimisticCount.toLocaleString();
+                    } else {
+                        visitsCountEl.innerText = '—';
+                    }
                 });
+
+            // ── ANIMACIÓN SUAVE DEL NÚMERO ──
+            function animateCount(el, from, to) {
+                if (from === to) {
+                    el.innerText = to.toLocaleString();
+                    return;
+                }
+                const duration = 800;
+                const start = performance.now();
+                const diff = to - from;
+                function step(now) {
+                    const elapsed = now - start;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const eased = 1 - Math.pow(1 - progress, 3);
+                    el.innerText = Math.round(from + diff * eased).toLocaleString();
+                    if (progress < 1) requestAnimationFrame(step);
+                }
+                requestAnimationFrame(step);
+            }
         });
     </script>
 
