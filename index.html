@@ -632,6 +632,7 @@ function playFeaturedVideo(card) {
 
 document.addEventListener("DOMContentLoaded", function () {
     const localKey       = 'gaby_user_status';
+    const cachedCountKey = 'gaby_global_visits_cache';
     const visitsCountEl  = document.getElementById('visitas-count');
     const visitsStatusEl = document.getElementById('visitas-status');
 
@@ -644,8 +645,14 @@ document.addEventListener("DOMContentLoaded", function () {
         visitsStatusEl.innerHTML = "<strong>- Visitante recurrente</strong> 🔥";
     }
 
-    // ── Llamar a la API global ──
-    // Nuevo usuario → /up (suma +1)   |   Recurrente → solo lee (sin sumar)
+    // ── MOSTRAR INMEDIATAMENTE (sin esperar la API) ──
+    // Último número real guardado. Si es visitante nuevo, ya le sumamos 1 al instante.
+    const cachedCount = parseInt(localStorage.getItem(cachedCountKey) || '0');
+    const displayCount = isNewUser ? cachedCount + 1 : cachedCount;
+    visitsCountEl.innerText = displayCount.toLocaleString();
+
+    // ── CONFIRMAR CON LA API EN SEGUNDO PLANO ──
+    // Actualiza el número con el valor real del servidor y guarda en caché.
     const ns  = 'sebasdevs01-gaby';
     const key = 'visits2';
     const apiUrl = isNewUser
@@ -657,6 +664,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(data => {
             const total = data.count ?? data.value;
             if (total != null) {
+                localStorage.setItem(cachedCountKey, total);
                 visitsCountEl.innerText = parseInt(total).toLocaleString();
             }
         })
@@ -670,11 +678,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 .then(data => {
                     const total = data.value;
                     if (total != null) {
+                        localStorage.setItem(cachedCountKey, total);
                         visitsCountEl.innerText = parseInt(total).toLocaleString();
                     }
                 })
                 .catch(() => {
-                    visitsCountEl.innerText = '—';
+                    // Sin internet: el número optimista ya se está mostrando, guardarlo.
+                    localStorage.setItem(cachedCountKey, displayCount);
                 });
         });
 });
