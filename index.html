@@ -230,7 +230,7 @@ html, body {
     aspect-ratio: 16 / 9;
 }
 
-.featured-card::before {
+.featured-card:not(.video-playing)::before {
     content: '';
     position: absolute;
     top: 0; left: -100%;
@@ -241,13 +241,17 @@ html, body {
     z-index: 5;
 }
 
+.featured-card.video-playing {
+    cursor: default;
+}
+
 @keyframes shine {
     0% { left: -100%; }
     20% { left: 200%; }
     100% { left: 200%; }
 }
 
-.featured-card:hover {
+.featured-card:not(.video-playing):hover {
     transform: translateY(-8px) scale(1.03);
     box-shadow: 0 25px 50px rgba(212, 163, 115, 0.45);
     border-color: rgba(212, 163, 115, 0.75);
@@ -265,7 +269,7 @@ html, body {
     transition: all 0.7s ease;
 }
 
-.featured-card:hover .featured-bg {
+.featured-card:not(.video-playing):hover .featured-bg {
     filter: blur(0px) brightness(0.85);
     transform: scale(1.08);
 }
@@ -317,7 +321,7 @@ html, body {
     transition: color 0.3s ease;
 }
 
-.featured-card:hover .featured-content h2 {
+.featured-card:not(.video-playing):hover .featured-content h2 {
     color: #ffebd9;
 }
 
@@ -344,7 +348,7 @@ html, body {
     box-shadow: 0 10px 20px rgba(0,0,0,0.3);
 }
 
-.featured-card:hover .featured-btn {
+.featured-card:not(.video-playing):hover .featured-btn {
     background: #d4a373;
     color: white;
     box-shadow: 0 15px 30px rgba(212, 163, 115, 0.5);
@@ -513,7 +517,7 @@ html, body {
     <div class="main">
 
         <!-- TARJETA DESTACADA: SIENTO QUE TE PIERDO -->
-        <div class="featured-card" onclick="this.innerHTML=`<iframe width='100%' height='100%' style='position:absolute; top:0; left:0; width:100%; height:100%; border:none; border-radius:24px;' src='https://www.youtube.com/embed/c20Z3LdNlMw?autoplay=1' allow='autoplay; encrypted-media; picture-in-picture' allowfullscreen></iframe>`; this.onclick=null;">
+        <div class="featured-card" onclick="playFeaturedVideo(this)">
             <div class="featured-bg"></div>
             <div class="featured-content">
                 <span class="badge">¡NUEVO LANZAMIENTO!</span>
@@ -588,6 +592,43 @@ html, body {
 
 <!-- SCRIPT CONTADOR DE VISITAS (API GLOBAL REAL) -->
 <script>
+function playFeaturedVideo(card) {
+    card.classList.add('video-playing');
+    card.onclick = null;
+    
+    // Ocultar texto y botón suavemente con una transición
+    const content = card.querySelector('.featured-content');
+    if (content) {
+        content.style.transition = 'opacity 0.4s ease';
+        content.style.opacity = '0';
+        content.style.pointerEvents = 'none';
+    }
+    
+    // Fijar el fondo sin desenfoque y con menor brillo para dar buen contraste al reproductor
+    const bg = card.querySelector('.featured-bg');
+    if (bg) {
+        bg.style.transition = 'all 0.5s ease';
+        bg.style.filter = 'blur(0px) brightness(0.4)';
+        bg.style.transform = 'scale(1)';
+    }
+    
+    // Crear el iframe e insertarlo
+    const iframe = document.createElement('iframe');
+    iframe.src = 'https://www.youtube.com/embed/c20Z3LdNlMw?autoplay=1';
+    iframe.style.position = 'absolute';
+    iframe.style.top = '0';
+    iframe.style.left = '0';
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
+    iframe.style.border = 'none';
+    iframe.style.borderRadius = '24px';
+    iframe.style.zIndex = '3';
+    iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture');
+    iframe.setAttribute('allowfullscreen', '');
+    
+    card.appendChild(iframe);
+}
+
 document.addEventListener("DOMContentLoaded", function () {
     const counterNamespace = "gaby_castaneda_linktree";
     const counterKey = "visitas_gaby_2026_real";
