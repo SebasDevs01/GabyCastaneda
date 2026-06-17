@@ -631,52 +631,57 @@ function playFeaturedVideo(card) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-    const counterNamespace = "gaby_castaneda_linktree";
-    const counterKey = "visitas_gaby_2026_real";
     const localKey = 'gaby_user_status';
     const cachedCountKey = 'gaby_global_visits_cache';
-    
+
     const visitsCard = document.getElementById('visitas-card');
     const visitsCountEl = document.getElementById('visitas-count');
     const visitsStatusEl = document.getElementById('visitas-status');
 
-    // Helper: muestra la tarjeta con el número real, sin parpadeos
     function showCounter(number) {
         visitsCountEl.innerText = parseInt(number).toLocaleString();
         visitsCard.style.pointerEvents = 'auto';
         visitsCard.style.opacity = '1';
     }
-    
-    // 1. Determinar si el visitante es nuevo en este navegador
+
+    // Determinar si el visitante es nuevo en este navegador
     let isNewUser = !localStorage.getItem(localKey);
     if (isNewUser) {
         localStorage.setItem(localKey, 'visited');
-        visitsStatusEl.innerHTML = "<strong>- Visitante nuevo</strong> 🎉";
+        visitsStatusEl.innerHTML = "<strong>- Visitante nueva</strong> 🎉";
     } else {
         visitsStatusEl.innerHTML = "<strong>- Visitante recurrente</strong> 🔥";
     }
 
-    // 2. Mostrar valor en caché inmediatamente (visita recurrente → sin esperar la API)
+    // Mostrar caché inmediatamente mientras carga la API
     const cachedValue = localStorage.getItem(cachedCountKey);
-    if (cachedValue) {
-        showCounter(cachedValue);
-    }
+    if (cachedValue) showCounter(cachedValue);
 
-    // 3. Llamar a la API para incrementar y obtener el total real
-    fetch(`https://api.counterapi.dev/v1/${counterNamespace}/${counterKey}/up`)
-        .then(response => response.json())
+    // Usar CountAPI como API de conteo pública y gratuita
+    fetch('https://api.countapi.xyz/hit/sebasdevs01-GabyCastaneda/visits')
+        .then(r => r.json())
         .then(data => {
-            const totalVisitas = data.count || 0;
-            localStorage.setItem(cachedCountKey, totalVisitas);
-            showCounter(totalVisitas);
+            const total = data.value || 1;
+            localStorage.setItem(cachedCountKey, total);
+            showCounter(total);
         })
         .catch(() => {
-            // Sin conexión: usar fallback local
-            let currentLocal = parseInt(localStorage.getItem('fallback_count_gaby') || 40);
-            if (isNewUser) currentLocal += 1;
-            localStorage.setItem('fallback_count_gaby', currentLocal);
-            localStorage.setItem(cachedCountKey, currentLocal);
-            showCounter(currentLocal);
+            // Si falla la API, intentar con segunda API de respaldo
+            fetch('https://hits.seeyoufarm.com/api/count/incr/badge.json?url=sebasdevs01.github.io%2FGabyCastaneda&count_bg=%23000000&title_bg=%23000000&icon=&icon_color=%23000000&title=&edge_flat=false')
+                .then(r => r.json())
+                .then(d => {
+                    const total = d.today + d.total || 1;
+                    localStorage.setItem(cachedCountKey, total);
+                    showCounter(total);
+                })
+                .catch(() => {
+                    // Sin conexión: usar fallback local
+                    let local = parseInt(localStorage.getItem('fallback_count_gaby') || '100');
+                    local += 1;
+                    localStorage.setItem('fallback_count_gaby', local);
+                    localStorage.setItem(cachedCountKey, local);
+                    showCounter(local);
+                });
         });
 });
 </script>
