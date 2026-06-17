@@ -200,6 +200,7 @@ html, body {
     align-items: center;
     gap: 8px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    transition: opacity 0.5s ease;
 }
 
 .micro-card i {
@@ -508,8 +509,8 @@ html, body {
         <p class="bio">Cantante y compositora 🎤 Ecuador 📍</p>
 
         <!-- CONTADOR DE VISITAS -->
-        <div class="micro-card" id="visitas-card">
-            <i class="fa-solid fa-chart-line"></i> Visitas: <strong id="visitas-count">--</strong> <span id="visitas-status"></span>
+        <div class="micro-card" id="visitas-card" style="opacity:0; pointer-events:none;">
+            <i class="fa-solid fa-chart-line"></i> Visitas: <strong id="visitas-count"></strong> <span id="visitas-status"></span>
         </div>
     </div>
 
@@ -633,31 +634,49 @@ document.addEventListener("DOMContentLoaded", function () {
     const counterNamespace = "gaby_castaneda_linktree";
     const counterKey = "visitas_gaby_2026_real";
     const localKey = 'gaby_user_status';
+    const cachedCountKey = 'gaby_global_visits_cache';
+    
+    const visitsCard = document.getElementById('visitas-card');
+    const visitsCountEl = document.getElementById('visitas-count');
+    const visitsStatusEl = document.getElementById('visitas-status');
+
+    // Helper: muestra la tarjeta con el número real, sin parpadeos
+    function showCounter(number) {
+        visitsCountEl.innerText = parseInt(number).toLocaleString();
+        visitsCard.style.pointerEvents = 'auto';
+        visitsCard.style.opacity = '1';
+    }
     
     // 1. Determinar si el visitante es nuevo en este navegador
     let isNewUser = !localStorage.getItem(localKey);
     if (isNewUser) {
         localStorage.setItem(localKey, 'visited');
-        document.getElementById('visitas-status').innerHTML = "<strong>- Visitante nuevo</strong> 🎉";
+        visitsStatusEl.innerHTML = "<strong>- Visitante nuevo</strong> 🎉";
     } else {
-        document.getElementById('visitas-status').innerHTML = "<strong>- Visitante recurrente</strong> 🔥";
+        visitsStatusEl.innerHTML = "<strong>- Visitante recurrente</strong> 🔥";
     }
 
-    // 2. Conectar a un contador API global gratuito en tiempo real
+    // 2. Mostrar valor en caché inmediatamente (visita recurrente → sin esperar la API)
+    const cachedValue = localStorage.getItem(cachedCountKey);
+    if (cachedValue) {
+        showCounter(cachedValue);
+    }
+
+    // 3. Llamar a la API para incrementar y obtener el total real
     fetch(`https://api.counterapi.dev/v1/${counterNamespace}/${counterKey}/up`)
         .then(response => response.json())
         .then(data => {
-            // Si funciona, mostramos los clics reales globales partiendo de 0
-            let totalVisitas = data.count || 0;
-            document.getElementById('visitas-count').innerText = totalVisitas.toLocaleString();
+            const totalVisitas = data.count || 0;
+            localStorage.setItem(cachedCountKey, totalVisitas);
+            showCounter(totalVisitas);
         })
-        .catch(error => {
-            // Fallback de seguridad local si falla la API
-            let baseGlobal = 0;
-            let currentLocal = localStorage.getItem('fallback_count_gaby') || baseGlobal;
-            currentLocal = parseInt(currentLocal) + (isNewUser ? 1 : 0);
+        .catch(() => {
+            // Sin conexión: usar fallback local
+            let currentLocal = parseInt(localStorage.getItem('fallback_count_gaby') || 40);
+            if (isNewUser) currentLocal += 1;
             localStorage.setItem('fallback_count_gaby', currentLocal);
-            document.getElementById('visitas-count').innerText = parseInt(currentLocal).toLocaleString();
+            localStorage.setItem(cachedCountKey, currentLocal);
+            showCounter(currentLocal);
         });
 });
 </script>
