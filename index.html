@@ -631,14 +631,15 @@ function playFeaturedVideo(card) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-    const localKey = 'gaby_user_status';
+    const BASE_COUNT = 100; // El contador arranca visualmente desde este número
+    const localKey      = 'gaby_user_status';
     const cachedCountKey = 'gaby_global_visits_cache';
 
-    const visitsCountEl = document.getElementById('visitas-count');
+    const visitsCountEl  = document.getElementById('visitas-count');
     const visitsStatusEl = document.getElementById('visitas-status');
 
-    // Determinar si el visitante es nuevo en este navegador
-    let isNewUser = !localStorage.getItem(localKey);
+    // ── Visitante nuevo o recurrente ──
+    const isNewUser = !localStorage.getItem(localKey);
     if (isNewUser) {
         localStorage.setItem(localKey, 'visited');
         visitsStatusEl.innerHTML = "<strong>- Visitante nueva</strong> 🎉";
@@ -646,46 +647,49 @@ document.addEventListener("DOMContentLoaded", function () {
         visitsStatusEl.innerHTML = "<strong>- Visitante recurrente</strong> 🔥";
     }
 
-    // ── MOSTRAR INMEDIATAMENTE ──
-    // Usar caché local si existe, o un número base de 100, sin esperar la API
-    const cachedValue = parseInt(localStorage.getItem(cachedCountKey) || '100');
-    visitsCountEl.innerText = cachedValue.toLocaleString();
+    // ── Mostrar caché local de inmediato si existe ──
+    // (cada navegador actualiza su caché con el conteo real de la API)
+    const cachedValue = localStorage.getItem(cachedCountKey);
+    if (cachedValue) {
+        visitsCountEl.innerText = (BASE_COUNT + parseInt(cachedValue)).toLocaleString();
+    }
+    // Si no hay caché aún, el HTML ya muestra "..." como placeholder
 
-    // ── ACTUALIZAR EN SEGUNDO PLANO ──
-    // El número se actualiza silenciosamente cuando la API responde
-    const apiUrl = isNewUser
-        ? 'https://api.countapi.xyz/hit/sebasdevs01-GabyCastaneda/visits'
-        : 'https://api.countapi.xyz/get/sebasdevs01-GabyCastaneda/visits';
+    // ── API global: counterapi.dev (alternativa confiable a CountAPI) ──
+    // hit → suma +1 y devuelve el total  |  get → solo lee el total
+    const ns  = 'sebasdevs01-gaby';
+    const key = 'visits2';
+    const primaryUrl = isNewUser
+        ? `https://api.counterapi.dev/v1/${ns}/${key}/up`
+        : `https://api.counterapi.dev/v1/${ns}/${key}`;
 
-    fetch(apiUrl)
+    fetch(primaryUrl)
         .then(r => r.json())
         .then(data => {
-            if (data && data.value) {
-                localStorage.setItem(cachedCountKey, data.value);
-                visitsCountEl.innerText = parseInt(data.value).toLocaleString();
+            // counterapi.dev responde { count: N }
+            const total = data.count ?? data.value;
+            if (total != null) {
+                localStorage.setItem(cachedCountKey, total);
+                visitsCountEl.innerText = (BASE_COUNT + parseInt(total)).toLocaleString();
             }
         })
         .catch(() => {
-            // Respaldo: hits.seeyoufarm (solo suma si es nuevo)
+            // ── Respaldo: CountAPI original ──
             const fallbackUrl = isNewUser
-                ? 'https://hits.seeyoufarm.com/api/count/incr/badge.json?url=sebasdevs01.github.io%2FGabyCastaneda&count_bg=%23000000&title_bg=%23000000&icon=&icon_color=%23000000&title=&edge_flat=false'
-                : 'https://hits.seeyoufarm.com/api/count/badge.json?url=sebasdevs01.github.io%2FGabyCastaneda';
+                ? 'https://api.countapi.xyz/hit/sebasdevs01-GabyCastaneda/visits'
+                : 'https://api.countapi.xyz/get/sebasdevs01-GabyCastaneda/visits';
             fetch(fallbackUrl)
                 .then(r => r.json())
-                .then(d => {
-                    const total = (d.today || 0) + (d.total || 0);
-                    if (total > 0) {
+                .then(data => {
+                    const total = data.value;
+                    if (total != null) {
                         localStorage.setItem(cachedCountKey, total);
-                        visitsCountEl.innerText = total.toLocaleString();
+                        visitsCountEl.innerText = (BASE_COUNT + parseInt(total)).toLocaleString();
                     }
                 })
                 .catch(() => {
-                    // Sin conexión: incrementar local solo si es visitante nuevo
-                    let local = parseInt(localStorage.getItem('fallback_count_gaby') || '100');
-                    if (isNewUser) local += 1;
-                    localStorage.setItem('fallback_count_gaby', local);
-                    localStorage.setItem(cachedCountKey, local);
-                    visitsCountEl.innerText = local.toLocaleString();
+                    // Sin internet: mantener caché o mostrar guion
+                    if (!cachedValue) visitsCountEl.innerText = (BASE_COUNT).toLocaleString();
                 });
         });
 });
