@@ -747,27 +747,41 @@
 
         document.addEventListener("DOMContentLoaded", function () {
             const localKey = 'gaby_user_status';
+            const sessionKey = 'gaby_session_counted';
             const cachedCountKey = 'gaby_global_visits_cache';
             const visitsCountEl = document.getElementById('visitas-count');
             const visitsStatusEl = document.getElementById('visitas-status');
 
-            // ── ¿Es un usuario nuevo en este navegador? ──
-            const isNewUser = !localStorage.getItem(localKey);
+            // ── Determinar si es visita genuinamente nueva ──
+            // localKey → persiste entre sesiones (visita anterior en este navegador)
+            // sessionKey → vive solo en esta pestaña/sesión activa
+            // Solo es "nuevo" si NUNCA visitó con este navegador (no tiene localKey)
+            // Y además no ha sido contado ya en esta sesión (evita doble conteo en recarga)
+            const hasVisitedBefore = !!localStorage.getItem(localKey);
+            const alreadyCountedThisSession = !!sessionStorage.getItem(sessionKey);
+
+            const isNewUser = !hasVisitedBefore && !alreadyCountedThisSession;
+
             if (isNewUser) {
+                // Marcar en localStorage (persistente) y en sessionStorage (esta sesión)
                 localStorage.setItem(localKey, 'visited');
+                sessionStorage.setItem(sessionKey, '1');
                 visitsStatusEl.innerHTML = "<strong>- Visitante nueva</strong> 🎉";
             } else {
                 visitsStatusEl.innerHTML = "<strong>- Visitante recurrente</strong> 🔥";
             }
 
-            // ── MOSTRAR INMEDIATAMENTE (sin esperar la API) ──
-            // Último número real guardado. Si es visitante nuevo, ya le sumamos 1 al instante.
+            // ── MOSTRAR NÚMERO CACHEADO INMEDIATAMENTE (sin esperar la API) ──
+            // Si es usuario nuevo, mostramos optimistamente +1 al caché mientras llega la respuesta real.
             const cachedCount = parseInt(localStorage.getItem(cachedCountKey) || '0');
-            const displayCount = isNewUser ? cachedCount + 1 : cachedCount;
-            visitsCountEl.innerText = displayCount.toLocaleString();
+            const optimisticCount = isNewUser ? cachedCount + 1 : cachedCount;
+            if (cachedCount > 0) {
+                visitsCountEl.innerText = optimisticCount.toLocaleString();
+            }
 
-            // ── CONFIRMAR CON LA API EN SEGUNDO PLANO ──
-            // Actualiza el número con el valor real del servidor y guarda en caché.
+            // ── SIEMPRE CONSULTAR LA API PARA OBTENER EL NÚMERO REAL ──
+            // Si es usuario nuevo → /up (suma 1 y devuelve total)
+            // Si es recurrente  → GET normal (solo lee el total real, sin sumar)
             const ns = 'sebasdevs01-gaby';
             const key = 'visits2';
             const apiUrl = isNewUser
@@ -798,8 +812,10 @@
                             }
                         })
                         .catch(() => {
-                            // Sin internet: el número optimista ya se está mostrando, guardarlo.
-                            localStorage.setItem(cachedCountKey, displayCount);
+                            // Sin internet: mostrar el número optimista que ya está visible.
+                            if (cachedCount === 0) {
+                                visitsCountEl.innerText = '...';
+                            }
                         });
                 });
         });
